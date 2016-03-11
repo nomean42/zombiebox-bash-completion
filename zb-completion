@@ -1,0 +1,36 @@
+# bash completion for zombiebox-cli
+
+have zb &&
+_zb()
+{
+    local cur prev
+    
+    COMPREPLY=()
+    _get_comp_words_by_ref cur prev
+
+    case $prev in
+
+        build )
+    	if [[ -f "package.json" ]]; then
+        	PLATFORMS=( $(cat package.json | grep zombiebox-platform | sed s/.*-// | sed s/\".*//) )
+        	COMPREPLY=( $( compgen -W '${PLATFORMS[@]} all' -- $cur) )
+    	fi	
+    	return 0
+    	;;
+        "build all" )
+        COMPREPLY=( $( compgen -W '${PLATFORMS[@]} all' -- $cur) )
+        return 0
+        ;;
+esac  
+  	
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $(compgen -W '--help -h --usage --version -v --enable-console' -- $cur) )
+        return 0
+
+    elif [[ "$cur" == * ]]; then
+        COMPREPLY=( $(compgen -W 'addPopup addScene addWidget build buildCode init run' -- $cur) )
+        return 0
+  
+    fi
+}
+complete -F _zb zb
